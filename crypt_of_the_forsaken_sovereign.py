@@ -33,6 +33,28 @@ items = {
     'Vault of the Soulless': 'Dagger of Eternity\'s End',
     'Lich\'s Sanctum': 'Lich King',
 }
+
+dungeon_descriptions = {
+    'Forsaken Gateway': 'A cold, wind-swept entrance with ancient ruins marking the start of the dungeon.',
+    'Decrepit Library': 'A large room with shelves upon shelves of decaying books. Dust fills the air, and the faint sound of whispering can be heard.',
+    'Hall of Mirrors': 'A corridor with walls made entirely of mirrors. As you walk, your reflection seems to move in eerie, unexpected ways.',
+    'Cursed Mausoleum': 'A dark, stone structure. The walls are adorned with the names of forgotten souls, and an ominous energy pervades the air.',
+    'Shrine to Forgotten Deities': 'An altar dedicated to gods long lost to time. Flickering candles and offerings suggest recent visitors.',
+    'Torture Chamber': 'A grim room filled with devices of pain and torment. Chains hang from the ceiling, and the floor is stained with the memories of suffering.',
+    'Lich\'s Sanctum': 'The heart of the dungeon. A room dominated by a large throne where the Lich King waits.',
+    'Vault of the Soulless': 'A hidden chamber containing treasures beyond imagination, guarded by spirits devoid of consciousness.'
+}
+
+item_descriptions = {
+    'Ancient Scroll': 'A scroll, yellowed with age, with cryptic writings that promise arcane knowledge.',
+    'Mirror of True Sight': 'A mirror that reflects not just your appearance, but your soul. Gazing into it might reveal hidden truths.',
+    'Stone of the Grave Warden': 'A dark, cold stone inscribed with protective runes. It emanates a subtle, protective aura.',
+    'Amulet of the Dawn Bringer': 'A gold amulet with a gem that gleams like the morning sun. It feels warm to the touch.',
+    'Chains of Binding': 'Heavy chains that, when worn, grant the bearer power over the spirits.',
+    'Dagger of Eternity\'s End': 'A blade forged from materials not of this world. It shimmers with an otherworldly glow.',
+    'Lich King': 'A skeletal figure draped in royal garb, holding a staff that pulses with dark energy.'
+}
+
 commands = ['north', 'south', 'east', 'west', 'pickup', 'exit']
 
 '''
@@ -75,6 +97,11 @@ def move_between_room(command, room):
     if command in dungeon[current_room]:
 
         current_room = room[command]
+        print('Moving {}, you enter {}'.format(command, current_room))
+        if dungeon_descriptions[current_room] != '':
+            print(dungeon_descriptions[current_room])
+        dungeon_descriptions[current_room] = ''
+        print('\n')
         return room[command]
     else:
         print('You can\'t go that way')
@@ -84,19 +111,22 @@ def move_between_room(command, room):
 # function used to update user's inventory with item
 def pickup_item(current_room):
     inventory.append(items[current_room])
-    print('you added {} to your inventory!'.format(items[current_room]))
+    print('you picked up the {}, and added it to your inventory!'.format(items[current_room]))
     items[current_room] = ''
 
 
 # function called for game loop
 def the_game():
     global current_room
-    print('You are in the {}'.format(current_room))
+
+#    print('You enter the {}'.format(current_room))
     if current_room == 'Lich\'s Sanctum':
         encounter()
     if items[current_room] != '':
-        print('You see {} on the ground'.format(items[current_room]))
-    command = input('what do you want to do?')
+        print('You see {} on the ground'.format(item_descriptions[items[current_room]]))
+    print('You are in the {}'.format(current_room))
+    print('Your Inventory: {}\n'.format(inventory))
+    command = input('What do you want to do?\n')
     response = execute_command(command)
     if not response:
         the_game()
@@ -118,6 +148,9 @@ print('Directions are: north, south, east, west.')
 print('To pick up an item, type pickup and the item will be added to your inventory.')
 print('To exit the game, type exit.')
 print('to beat the game, you must find all the items before you encounter the Lich King.')
-print('Good luck!')
+print('Good luck!\n')
+
+print('Your journey begins in {} \nThe Forsaken Gateway\n'.format(dungeon_descriptions[current_room]))
 
 the_game()
+
