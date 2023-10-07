@@ -13,6 +13,10 @@ To the south of the Hall of Mirror is the Torture Chamber, which contains the Ch
 To the North of the Shrine to Forgotten Deities is the Vault of the Soulless,
 which contains the Dagger of Eternity's End.
 """
+from rich import print
+from rich.panel import Panel
+from rich.text import Text
+
 # Dungeon layout of rooms and connection rooms
 dungeon = {
     'Forsaken Gateway': {'south': 'Decrepit Library'},
@@ -76,9 +80,11 @@ commands = ['north', 'south', 'east', 'west', 'pickup', 'exit']
 
 # function to handle encountering the boss
 def encounter(inventory):
-    print("\nAs you step into the Lich's Sanctum, a chilling wind sweeps through the room.")
-    print("From the shadows, the Lich King emerges, his hollow eyes fixed on you.")
-    print("Lich King: 'Mortal! You dare to challenge me in my own domain?'")
+    print("\n")
+    print(Panel("[dark_red]As you step into the Lich's Sanctum, a chilling wind sweeps through the room."))
+    print("[dark_red]From the shadows, the Lich King emerges, his hollow eyes fixed on you.")
+    print("[dark_red]Lich King: 'Mortal! You dare to challenge me in my own domain?'")
+
     # Win condition for beating the Lich
     required_items = ['Ancient Scroll', 'Mirror of True Sight', 'Stone of the Grave Warden',
                       'Amulet of the Dawn Bringer', 'Chains of Binding', 'Dagger of Eternity\'s End']
@@ -86,16 +92,16 @@ def encounter(inventory):
     missing_items = [item for item in required_items if item not in inventory]
     # If missing items, you lose the game.
     if missing_items:
-        print("\nLich King: 'You think you can face me without all the artifacts? Foolish mortal!'")
-        print("You realize you're missing the following items:", ', '.join(missing_items))
-        print("\nThe Lich King's power overwhelms you, and darkness takes hold...")
-        print('YOU LOSE :(')
+        print("\n[dark_red]Lich King: 'You think you can face me without all the artifacts? Foolish mortal!'")
+        print("[red]You realize you're missing the following items:", ', '.join(missing_items))
+        print("\n[dark_red]The Lich King's power overwhelms you, and darkness takes hold...")
+        print("[red]YOU LOSE :(")
     else:
-        print('\nThe Lich King stumbles backward, sensing the power of the artifacts you carry.')
-        print("Lich King: 'No... it cannot be! The artifacts...'")
-        print('With the combined strength of the six items, ')
+        print('\n[green]The Lich King stumbles backward, sensing the power of the artifacts you carry.')
+        print("[green]Lich King: 'No... it cannot be! The artifacts...'")
+        print('[green]With the combined strength of the six items, ')
         print('you banish the Lich King, freeing the crypt from his dark influence.')
-        print('YOU WIN!!')
+        print('[bright_green]YOU WIN!!')
 
     exit()
 
@@ -104,11 +110,12 @@ def encounter(inventory):
 def execute_command(command, current_room, inventory):
     # If player input not in commands let them know and relist commands for reference
     if command not in commands:
-        print('Invalid command. Please use one of the following:')
+        print('[red]Invalid command. Please use one of the following:')
         print(commands)
         return current_room, inventory
     # If command is exit, end game
     if command == 'exit':
+        print("[magenta]Exiting the game. Farewell, adventurer!")
         exit()
     _room = dungeon[current_room]
     # If command is pickup, call pickup_item function
@@ -128,26 +135,30 @@ def move_between_room(command, room):
     # check dungeon to see if current room has a room attached in the direction player chose
     if command in room:
         next_room = room[command]
-        print('\nMoving {}, you enter {}'.format(command, next_room))
+        print('[dark_cyan]Moving {}, you enter {}'.format(command, next_room))
         # adds room description first time the player enters the room.
         if room_descriptions[next_room] != '':
-            print(room_descriptions[next_room])
+            print('[blue]{}'.format(room_descriptions[next_room]))
         # updates room description, so it won't be displayed again.
         room_descriptions[next_room] = ''
         return next_room
     # If current room does not have an attached room return to the game loop with no changes
     else:
-        print('You can\'t go that way')
+        print('[red]You can\'t go that way')
         return None
 
 
 # function used to update user's inventory with item
 def pickup_item(current_room, inventory):
+    # prevents player from picking up an empty string.
+    if items[current_room] == '':
+        print('[red]There is nothing to pickup')
     # add current item to inventory.
-    inventory.append(items[current_room])
-    print('You picked up the {}, and added it to your inventory!'.format(items[current_room]))
-    # removes item from the room.
-    items[current_room] = ''
+    else:
+        inventory.append(items[current_room])
+        print('[yellow]You picked up the {}, and added it to your inventory!'.format(items[current_room]))
+        # removes item from the room.
+        items[current_room] = ''
     return inventory
 
 
@@ -157,7 +168,7 @@ def the_game():
     current_room = 'Forsaken Gateway'
     inventory = []
     # Introduction message
-    print('\nWelcome to the Crypt of the Forsaken Sovereign!')
+    print(Panel("[cyan]Welcome to the Crypt of the Forsaken Sovereign!"))
     print('A short text based game that will have you exploring the depths of an old abandoned crypt\n')
     '''
     now the player will be given directions on how to move around the dungeon, as well as how to pick up items.  
@@ -167,14 +178,14 @@ def the_game():
     to exit the game the player will type 'exit'.
     '''
     # Directions for the game.
-    print('To navigate the dungeon, simply type the direction you wish to go.')
-    print('Directions are: north, south, east, west.\n')
-    print('To pick up an item, type pickup and the item will be added to your inventory.')
-    print('To exit the game, type exit.\n')
-    print('To beat the game, you must find all the items before you encounter the Lich King.')
-    print('Good luck!\n')
+    print('[bright_white]To navigate the dungeon, simply type the direction you wish to go.')
+    print('[bright_green]Directions are: north, south, east, west.')
+    print('[bright_white]To pick up an item, type pickup and the item will be added to your inventory.')
+    print('[magenta]To exit the game, type exit.')
+    print('[bright_white]To beat the game, you must find all the items before you encounter the Lich King.')
+    print('[bright_white]Good luck!\n')
 
-    print('Your journey begins in {} \nThe Forsaken Gateway\n'.format(room_descriptions[current_room]))
+    print("[bright_blue]Your journey begins in {} \nThe Forsaken Gateway\n".format(room_descriptions[current_room]))
     # Actual Game Loop
     while True:
         # If the player enters the Lich's Sanctum run encounter function.
@@ -182,12 +193,13 @@ def the_game():
             encounter(inventory)
         # If there is in an item in the current room print the description for the player.
         if items[current_room] != '':
-            print('You see {} on the ground'.format(item_descriptions[items[current_room]]))
+            print('[yellow]You see {} on the ground'.format(item_descriptions[items[current_room]]))
         # Informs player of current location and items that they have collected in the journey
-        print('\nYou are in the {}'.format(current_room))
-        print('Your Inventory: {}\n'.format(inventory))
+        print('[blue]You are in the {}'.format(current_room))
+        print('[bright_green]Your Inventory: {}\n'.format(inventory))
         # Ask for user input.
-        command = input('What do you want to do?\n')
+        print('[cyan]What do you want to do?')
+        command = input()
         # input command with player location and their inventory into execute command function
         current_room, inventory = execute_command(command, current_room, inventory)
 
